@@ -82,10 +82,11 @@ counter.id = "counter";
 counter.innerText = "complete / total items: 0 / 0";
 document.body.appendChild(counter);
 
-function updateCounter() {
-    const completed = todos.filter(t => t.completed).length;
-    counter.innerText = `complete / total items: ${completed} / ${todos.length}`;
+function updateCounter(filteredList = todos) {
+    const completed = filteredList.filter(t => t.completed).length;
+    counter.innerText = `complete / total items: ${completed} / ${filteredList.length}`;
 }
+
 
 function saveTodos() {
     localStorage.setItem("todos", JSON.stringify(todos));
@@ -113,7 +114,28 @@ document.getElementById("clear_button").addEventListener("click", function () {
 // Dark mode
 document.getElementById("dark-mode-toggle").addEventListener("click", function () {
     document.body.classList.toggle("dark-mode");
+    console.log("Dark mode toggled");
 });
+
+//Search filter
+const searchInput = document.getElementById("search-input");
+
+searchInput.addEventListener("input", function() {
+    const searchTerm = this.value.toLowerCase();
+    filterTodosBySearch(searchTerm);
+});
+
+function filterTodosBySearch(searchTerm) {
+    todo_list.innerHTML = "";  // Clear existing list
+
+    const filteredTodos = todos.filter(todo => 
+        todo.text.toLowerCase().includes(searchTerm)
+    );
+
+    filteredTodos.forEach(todo => renderTodoItem(todo));
+    updateCounter(filteredTodos);
+}
+
 
 function filterTasks(filter) {
     const todoItems = document.querySelectorAll(".todo-item");
