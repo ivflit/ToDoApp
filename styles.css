@@ -252,3 +252,16 @@ h1 {
 .dark-toggle:hover {
     background-color: #e0e0e0;
 }
+
+.todo-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
