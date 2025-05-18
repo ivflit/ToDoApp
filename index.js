@@ -102,6 +102,19 @@ document.getElementById("filter-incomplete").addEventListener("click", () => {
     filterTasks("incomplete");
 });
 
+//clear tasks
+document.getElementById("clear_button").addEventListener("click", function () {
+    todos = [];
+    todo_list.innerHTML = "";
+    saveTodos();
+    updateCounter();
+});
+
+// Dark mode
+document.getElementById("dark-mode-toggle").addEventListener("click", function () {
+    document.body.classList.toggle("dark-mode");
+});
+
 function filterTasks(filter) {
     const todoItems = document.querySelectorAll(".todo-item");
     todoItems.forEach(item => {

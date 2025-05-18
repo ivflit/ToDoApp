@@ -52,6 +52,7 @@ h1 {
     flex-grow: 1;
     margin-right: 10px;
     word-break: break-word;
+    color: black !important;
 }
 
 .todo-item button {
@@ -113,4 +114,9 @@ h1 {
 .todo-item,
 .todo-item button {
     transition: all 0.2s ease-in-out;
+}
+
+.dark-mode {
+    background-color: #343a40;
+    color: white;
 }
