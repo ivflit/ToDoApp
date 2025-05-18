@@ -1,73 +1,97 @@
+const todo_list = document.getElementById("todo-list");
 const submit_button = document.getElementById("submit_button");
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
 
-submit_button.addEventListener("click", function(event) {
+// Restore tasks from localStorage on page load
+window.addEventListener("DOMContentLoaded", () => {
+    todos.forEach(todo => renderTodoItem(todo));
+    updateCounter();
+});
+
+submit_button.addEventListener("click", function (event) {
     event.preventDefault();
+    const input = document.getElementById("todo-input");
+    const text = input.value.trim();
+    if (text === "") return;
 
-    const todo_list = document.getElementById("todo-list");
+    const newTodo = {
+        id: Date.now(),
+        text: text,
+        completed: false
+    };
 
-    // New item creation
+    todos.push(newTodo);
+    saveTodos();
+    renderTodoItem(newTodo);
+    updateCounter();
+    input.value = "";
+});
+
+function renderTodoItem(todo) {
     const new_item = document.createElement("li");
     new_item.className = "todo-item";
-    new_item.id = "todo-item-" + (todo_list.children.length + 1);
+    new_item.id = `todo-item-${todo.id}`;
+    if (todo.completed) new_item.classList.add("completed");
 
-    // Create a span to hold the task text
     const task_text = document.createElement("span");
     task_text.className = "todo-text";
-    task_text.innerText = document.getElementById("todo-input").value;
+    task_text.innerText = todo.text;
 
-    // Create delete button on new item
-    const delete_button = document.createElement("button");
-    delete_button.innerText = "X";
-    delete_button.className = "delete-button";
-    delete_button.addEventListener("click", function() {
-        todo_list.removeChild(new_item);
-        updateCounter();
-    });
-
-    // Create completed button on new item
     const completed_button = document.createElement("button");
     completed_button.innerText = "✓";
     completed_button.className = "completed-button";
-    completed_button.addEventListener("click", function() {
+    completed_button.addEventListener("click", function () {
+        todo.completed = !todo.completed;
         new_item.classList.toggle("completed");
+        saveTodos();
         updateCounter();
     });
 
-    // Create edit button on new item
+    const delete_button = document.createElement("button");
+    delete_button.innerText = "X";
+    delete_button.className = "delete-button";
+    delete_button.addEventListener("click", function () {
+        todos = todos.filter(t => t.id !== todo.id);
+        todo_list.removeChild(new_item);
+        saveTodos();
+        updateCounter();
+    });
+
     const edit_button = document.createElement("button");
     edit_button.innerText = "Edit";
     edit_button.className = "edit-button";
-    edit_button.addEventListener("click", function() {
-        const newText = prompt("Edit your todo item:", task_text.innerText);
+    edit_button.addEventListener("click", function () {
+        const newText = prompt("Edit your todo item:", todo.text);
         if (newText !== null && newText.trim() !== "") {
-            task_text.innerText = newText;
+            todo.text = newText.trim();
+            task_text.innerText = todo.text;
+            saveTodos();
         }
     });
 
-    // Append elements to the new item
     new_item.appendChild(task_text);
     new_item.appendChild(completed_button);
     new_item.appendChild(delete_button);
     new_item.appendChild(edit_button);
-
-    // Add the new item to the list
     todo_list.appendChild(new_item);
-    updateCounter();
-});
+}
 
-// Counter setup
+// Counter
 const counter = document.createElement("div");
 counter.id = "counter";
 counter.innerText = "complete / total items: 0 / 0";
 document.body.appendChild(counter);
 
-// Counter update function
-const updateCounter = () => {
-    const totalItems = document.getElementById("todo-list").children.length;
-    const completedItems = document.querySelectorAll(".todo-item.completed").length;
-    counter.innerText = `complete / total items: ${completedItems} / ${totalItems}`;
-};
+function updateCounter() {
+    const completed = todos.filter(t => t.completed).length;
+    counter.innerText = `complete / total items: ${completed} / ${todos.length}`;
+}
 
+function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+// Filter
 document.getElementById("filter-all").addEventListener("click", () => {
     filterTasks("all");
 });
@@ -78,15 +102,15 @@ document.getElementById("filter-incomplete").addEventListener("click", () => {
     filterTasks("incomplete");
 });
 
-//Filter function
-const filterTasks = (filter) => {
+function filterTasks(filter) {
     const todoItems = document.querySelectorAll(".todo-item");
     todoItems.forEach(item => {
+        const isCompleted = item.classList.contains("completed");
         if (filter === "all") {
             item.style.display = "block";
-        } else if (filter === "completed" && item.classList.contains("completed")) {
+        } else if (filter === "completed" && isCompleted) {
             item.style.display = "block";
-        } else if (filter === "incomplete" && !item.classList.contains("completed")) {
+        } else if (filter === "incomplete" && !isCompleted) {
             item.style.display = "block";
         } else {
             item.style.display = "none";
